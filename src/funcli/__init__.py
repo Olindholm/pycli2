@@ -3,7 +3,7 @@ from collections.abc import Callable, Sequence
 from inspect import signature
 from typing import TypeVar
 
-from .parser import parse_args
+from ._parser import parse_args
 
 R = TypeVar("R")
 

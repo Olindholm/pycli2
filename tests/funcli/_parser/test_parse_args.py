@@ -1,11 +1,13 @@
 import inspect
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import AnyUrl
 from pytest import CaptureFixture
 
-from funcli.parser import parse_args
+from funcli._parser import parse_args
 
 
 def test_parse_args_simple() -> None:
@@ -17,6 +19,24 @@ def test_parse_args_simple() -> None:
     # Act & Assert
     pargs = parse_args(inspect.signature(func), args=args)
     assert pargs == {"a": "Hello", "b": 2, "c": 9.8}
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
+        (["--loc", "https://eg.com/file.txt"], {"loc": AnyUrl("https://eg.com/file.txt")}),
+        (["--loc", "file.txt"], {"loc": Path("file.txt")}),
+        (["--loc", "/root/file.txt"], {"loc": Path("/root/file.txt")}),
+        (["--loc", "../file.txt"], {"loc": Path("../file.txt")}),
+    ],
+)
+def test_parse_args_union(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(loc: AnyUrl | Path) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars
 
 
 def test_parse_args_defaults() -> None:
@@ -65,6 +85,23 @@ def test_parse_args_tuple(args: Sequence[str], vars: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args, vars",
     [
+        ([], {"names": None}),
+        (["--names", "Thor", "Odin"], {"names": ("Thor", "Odin")}),
+        (["--names", "Thor", "--names", "Odin"], {"names": ("Thor", "Odin")}),
+    ],
+)
+def test_parse_args_tuple_none(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(names: tuple[str, ...] | None = None) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
         (["--names", "Thor", "Odin"], {"names": ["Thor", "Odin"]}),
         (["--names", "Thor", "--names", "Odin"], {"names": ["Thor", "Odin"]}),
     ],
@@ -81,6 +118,23 @@ def test_parse_args_list(args: Sequence[str], vars: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args, vars",
     [
+        ([], {"names": None}),
+        (["--names", "Thor", "Odin"], {"names": ["Thor", "Odin"]}),
+        (["--names", "Thor", "--names", "Odin"], {"names": ["Thor", "Odin"]}),
+    ],
+)
+def test_parse_args_list_none(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(names: list[str] | None = None) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
         (["--names", "Thor", "Odin"], {"names": {"Thor", "Odin"}}),
         (["--names", "Thor", "--names", "Odin"], {"names": {"Thor", "Odin"}}),
     ],
@@ -88,6 +142,23 @@ def test_parse_args_list(args: Sequence[str], vars: dict[str, Any]) -> None:
 def test_parse_args_set(args: Sequence[str], vars: dict[str, Any]) -> None:
     # Arrange
     def func(names: set[str]) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
+        ([], {"names": None}),
+        (["--names", "Thor", "Odin"], {"names": {"Thor", "Odin"}}),
+        (["--names", "Thor", "--names", "Odin"], {"names": {"Thor", "Odin"}}),
+    ],
+)
+def test_parse_args_set_none(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(names: set[str] | None = None) -> None: ...
 
     # Act & Assert
     pargs = parse_args(inspect.signature(func), args=args)
