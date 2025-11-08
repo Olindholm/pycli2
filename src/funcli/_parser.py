@@ -1,10 +1,12 @@
-from argparse import ArgumentParser
+import logging
+from argparse import Action, ArgumentParser, Namespace
 from collections.abc import Iterable, Mapping, Sequence
 from inspect import Parameter, Signature
 from types import GenericAlias, NoneType, UnionType
 from typing import Any, cast, get_args, get_origin
 
 from pydantic import TypeAdapter
+from typing_extensions import override
 
 
 def parse_args(
@@ -39,7 +41,7 @@ def parse_args(
     }
 
 
-ArgType = tuple[str | None, int | str | None]
+ArgType = tuple[str | type[Action] | None, int | str | None]
 
 
 def get_argtype(types: Iterable[type]) -> ArgType:
@@ -48,23 +50,61 @@ def get_argtype(types: Iterable[type]) -> ArgType:
         types = set(types)
         types.discard(NoneType)
 
-    if all(is_listlike(type_) for type_ in types):
+    if all(is_sequenceish(type_) for type_ in types):
         return "extend", "+"
-    if all(is_dictlike(type_) for type_ in types):
-        return "extend", "+"
+    if all(is_mapish(type_) for type_ in types):
+        return MapAction, "+"
 
-    if any(is_listlike(type_) or is_dictlike(type_) for type_ in types):
+    if any(is_sequenceish(type_) or is_mapish(type_) for type_ in types):
         raise TypeError()
 
     return None, None
 
 
-def is_listlike(type_: type) -> bool:
+def is_sequenceish(type_: type) -> bool:
+    """Returns whether the type is sequence(ish).
+
+    Sequence(ish) meaning types such as tuples, lists, sets, etc. Strings are excluded.
+    Mappings are technically sequences but are also excluded.
+    """
     return issubclass(type_, Sequence) and not issubclass(type_, str) or issubclass(type_, set)
 
 
-def is_dictlike(type_: type) -> bool:
+def is_mapish(type_: type) -> bool:
+    """Returns whether the type is map(ish).
+
+    Map(ish) meaning basically a map, such as dicts.
+    """
     return issubclass(type_, Mapping)
+
+
+class MapAction(Action):
+    def __init__(self, option_strings: str, dest: str, nargs: str | None, **kwargs: Any):
+        if nargs is None:
+            raise ValueError("nargs must be provided!")
+
+        super().__init__(option_strings, dest, nargs, **kwargs)
+
+    @override
+    def __call__(
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        values: Sequence[str],  # type: ignore[override] # This is ensured by __init__
+        option_string: str | None = None,
+    ) -> None:
+        map = getattr(namespace, self.dest) or {}
+
+        for value in values:
+            k, v = value.split("=")
+
+            if k in map:
+                msg = f"Mapping key {k} was provided more than once. Last value will be used."
+                logging.warning(msg)
+
+            map[k] = v
+
+        setattr(namespace, self.dest, map)
 
 
 def get_types(*annotations: type) -> tuple[type, ...]:

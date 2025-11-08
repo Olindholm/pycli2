@@ -163,3 +163,48 @@ def test_parse_args_set_none(args: Sequence[str], vars: dict[str, Any]) -> None:
     # Act & Assert
     pargs = parse_args(inspect.signature(func), args=args)
     assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
+        (
+            ["--genders", "Thor=Male", "Freja=Female"],
+            {"genders": {"Thor": "Male", "Freja": "Female"}},
+        ),
+        (
+            ["--genders", "Thor=Male", "--genders", "Freja=Female"],
+            {"genders": {"Thor": "Male", "Freja": "Female"}},
+        ),
+    ],
+)
+def test_parse_args_dict(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(genders: dict[str, str]) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
+        ([], {"genders": None}),
+        (
+            ["--genders", "Thor=Male", "Freja=Female"],
+            {"genders": {"Thor": "Male", "Freja": "Female"}},
+        ),
+        (
+            ["--genders", "Thor=Male", "--genders", "Freja=Female"],
+            {"genders": {"Thor": "Male", "Freja": "Female"}},
+        ),
+    ],
+)
+def test_parse_args_dict_none(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(genders: dict[str, str] | None = None) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars

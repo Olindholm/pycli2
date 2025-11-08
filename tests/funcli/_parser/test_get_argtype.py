@@ -2,34 +2,35 @@ from types import NoneType
 
 import pytest
 
-from funcli._parser import ArgType, get_argtype
+from funcli._parser import ArgType, MapAction, get_argtype
 
-MONO_ARG = None, None
-POLY_ARG = "extend", "+"
+SINGLE_ARG = None, None
+SEQUNCEISH_ARG = "extend", "+"
+MAPISH_ARG = MapAction, "+"
 
 
 @pytest.mark.parametrize(
     "types, argtype",
     [
         # Base types
-        ((str,), MONO_ARG),
-        ((int,), MONO_ARG),
-        ((bool,), MONO_ARG),
-        ((float,), MONO_ARG),
+        ((str,), SINGLE_ARG),
+        ((int,), SINGLE_ARG),
+        ((bool,), SINGLE_ARG),
+        ((float,), SINGLE_ARG),
         # Unions
-        ((str, int, NoneType), MONO_ARG),
+        ((str, int, NoneType), SINGLE_ARG),
         # Tuples
-        ((tuple,), POLY_ARG),
-        ((tuple, NoneType), POLY_ARG),
+        ((tuple,), SEQUNCEISH_ARG),
+        ((tuple, NoneType), SEQUNCEISH_ARG),
         # Lists
-        ((list,), POLY_ARG),
-        ((list, NoneType), POLY_ARG),
+        ((list,), SEQUNCEISH_ARG),
+        ((list, NoneType), SEQUNCEISH_ARG),
         # Sets
-        ((set,), POLY_ARG),
-        ((set, NoneType), POLY_ARG),
+        ((set,), SEQUNCEISH_ARG),
+        ((set, NoneType), SEQUNCEISH_ARG),
         # Dicts
-        ((dict,), POLY_ARG),
-        ((dict, NoneType), POLY_ARG),
+        ((dict,), MAPISH_ARG),
+        ((dict, NoneType), MAPISH_ARG),
     ],
 )
 def test_correct_return(types: tuple[type, ...], argtype: ArgType) -> None:
