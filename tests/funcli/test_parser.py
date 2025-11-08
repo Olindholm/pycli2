@@ -60,3 +60,35 @@ def test_parse_args_tuple(args: Sequence[str], vars: dict[str, Any]) -> None:
     # Act & Assert
     pargs = parse_args(inspect.signature(func), args=args)
     assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
+        (["--names", "Thor", "Odin"], {"names": ["Thor", "Odin"]}),
+        (["--names", "Thor", "--names", "Odin"], {"names": ["Thor", "Odin"]}),
+    ],
+)
+def test_parse_args_list(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(names: list[str]) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars
+
+
+@pytest.mark.parametrize(
+    "args, vars",
+    [
+        (["--names", "Thor", "Odin"], {"names": {"Thor", "Odin"}}),
+        (["--names", "Thor", "--names", "Odin"], {"names": {"Thor", "Odin"}}),
+    ],
+)
+def test_parse_args_set(args: Sequence[str], vars: dict[str, Any]) -> None:
+    # Arrange
+    def func(names: set[str]) -> None: ...
+
+    # Act & Assert
+    pargs = parse_args(inspect.signature(func), args=args)
+    assert pargs == vars

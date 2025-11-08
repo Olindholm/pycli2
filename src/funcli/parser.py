@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from inspect import Parameter, Signature
 from typing import Any, Literal, cast, get_args, get_origin
 
@@ -43,7 +43,7 @@ def _get_action_nargs(
 ) -> tuple[Literal["extend"], Literal["+"]] | tuple[None, None]:
     outertype, innertypes = _get_types(annotation)
 
-    if issubclass(outertype, Sequence) and not issubclass(outertype, str):
+    if issubclass(outertype, Iterable) and not issubclass(outertype, str):
         return "extend", "+"
 
     return None, None
