@@ -1,0 +1,100 @@
+{
+    // Hide files ignored by git
+    "explorer.excludeGitIgnore": true,
+    "files.exclude": {
+        ".venv/*": true,
+        "**/__pycache__": true,
+        "**/*.egg-info": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/.mypy_cache": true,
+        "jellyfin/config/*": true,
+        "jellyseerr/config/*": true,
+        "plex/config/*": true,
+        "prowlarr/config/*": true,
+        "radarr/config/*": true,
+    },
+    "files.watcherExclude": {
+        ".venv/*": true,
+        "**/__pycache__": true,
+        "**/*.egg-info": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/.mypy_cache": true,
+        "jellyfin/config/*": true,
+        "jellyseerr/config/*": true,
+        "plex/config/*": true,
+        "prowlarr/config/*": true,
+        "radarr/config/*": true,
+    },
+
+    // Formatting
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.trimFinalNewlines": true,
+
+    // Set tab indention 4 spaces.
+    // The number of spaces a tab is equal to. This setting is overridden
+    // based on the file contents when `editor.detectIndentation` is true.
+    "editor.tabSize": 4,
+
+    // Insert spaces when pressing Tab. This setting is overriden
+    // based on the file contents when `editor.detectIndentation` is true.
+    "editor.insertSpaces": true,
+
+    // When opening a file, `editor.tabSize` and `editor.insertSpaces`
+    // will be detected based on the file contents. Set to false to keep
+    // the values you've explicitly set, above.
+    "editor.detectIndentation": false,
+
+    "editor.rulers": [88, 100],
+
+    // Perform a login for terminals
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "bash",
+            "icon": "terminal-bash",
+            "args": [
+                "-l"
+            ]
+        }
+    },
+
+    // Python
+    "python.languageServer": "Pylance",
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.analysis.importFormat": "relative",
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+        },
+    },
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "mypy-type-checker.severity": {
+        "error": "Warning",
+        "note": "Information",
+    },
+    "mypy-type-checker.args": [
+        "--ignore-missing-import",
+        "--disallow-untyped-defs",
+        "--disallow-any-generics",
+        "--enable-error-code",
+        "unused-awaitable",
+        "--enable-error-code",
+        "unused-ignore",
+        "--enable-error-code",
+        "redundant-self",
+        "--enable-error-code",
+        "possibly-undefined",
+        "--enable-error-code",
+        "truthy-bool",
+        "--enable-error-code",
+        "explicit-override",
+    ],
+}

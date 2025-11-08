@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        // Python
+        "ms-python.python",
+        "ms-python.mypy-type-checker",
+        "charliermarsh.ruff",
+        // TOML
+        "tamasfe.even-better-toml",
+        // YAML
+        "redhat.vscode-yaml",
+    ],
+}
