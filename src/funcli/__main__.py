@@ -31,4 +31,9 @@ def roll(sides: int = 6) -> None:
 
 
 if __name__ == "__main__":
-    a = run(message, shoutout, roll)
+    a = run(
+        message,
+        shoutout,
+        roll,
+        description="Welcome to the funcli demo example! Select a function to try out!",
+    )

@@ -20,14 +20,16 @@ def parse_func_args(
     *callables: Func[R],
     args: Sequence[str] | None,
     prog: str | None = None,
+    description: str | None = None,
+    epilog: str | None = None,
 ) -> tuple[Func[R], dict[str, Any]]:
     if args is None:
         args = sys.argv[1:]
 
     rootparser = ArgumentParser(
         prog=prog,
-        description="What the program does",
-        epilog="Text at the bottom of help",
+        description=description,
+        epilog=epilog,
     )
     subparser = rootparser.add_subparsers(
         title="Function to run",
@@ -43,7 +45,7 @@ def parse_func_args(
         funcparser = subparser.add_parser(
             name,
             description=func.__doc__,
-            help="This is a helpful string.",
+            help=(func.__doc__ or "").split("\n")[0],
         )
 
         for key, param in sig.parameters.items():
