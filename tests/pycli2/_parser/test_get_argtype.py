@@ -2,7 +2,7 @@ from types import NoneType
 
 import pytest
 
-from funcli._parser import ArgType, MapAction, get_argtype
+from pycli2._parser import ArgType, MapAction, get_argtype
 
 SINGLE_ARG = None, None
 SEQUNCEISH_ARG = "extend", "+"

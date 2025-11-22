@@ -6,7 +6,7 @@ import pytest
 from pydantic import AnyUrl
 from pytest import CaptureFixture
 
-from funcli._parser import parse_func_args
+from pycli2._parser import parse_func_args
 
 
 def test_simple() -> None:

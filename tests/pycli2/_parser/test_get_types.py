@@ -2,7 +2,7 @@ from types import NoneType
 
 import pytest
 
-from funcli._parser import get_types
+from pycli2._parser import get_types
 
 
 @pytest.mark.parametrize(
