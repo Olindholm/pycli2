@@ -1,44 +1,90 @@
 import logging
+import sys
 from argparse import Action, ArgumentParser, Namespace
-from collections.abc import Iterable, Mapping, Sequence
-from inspect import Parameter, Signature
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from inspect import Parameter, Signature, signature
 from types import GenericAlias, NoneType, UnionType
-from typing import Any, cast, get_args, get_origin
+from typing import Any, TypeVar, cast, get_args, get_origin
 
 from pydantic import TypeAdapter
 from typing_extensions import override
 
+R = TypeVar("R")
+Func = Callable[..., R]
 
-def parse_args(
-    sig: Signature,
-    args: Sequence[str],
+FUNC_DEST = "__FUNC__"
+BANNED_KEYWORDS = (FUNC_DEST,)
+
+
+def parse_func_args(
+    *callables: Func[R],
+    args: Sequence[str] | None,
     prog: str | None = None,
-) -> dict[str, Any]:
-    parser = ArgumentParser(
+) -> tuple[Func[R], dict[str, Any]]:
+    if args is None:
+        args = sys.argv[1:]
+
+    rootparser = ArgumentParser(
         prog=prog,
         description="What the program does",
         epilog="Text at the bottom of help",
     )
+    subparser = rootparser.add_subparsers(
+        title="Function to run",
+        description="Run the selected function by entering it's name.",
+        help="For more function specific info, select it and add -h/--help after it.",
+        dest=FUNC_DEST,
+        required=True,
+        metavar="FUNC",
+    )
 
-    for name, param in sig.parameters.items():
-        annotation: type = param.annotation
-        action, nargs = get_argtype(get_types(annotation))
-        required = param.default == Parameter.empty
-        metavar = type(annotation).__name__ + ("" if required else f" (default: {param.default})")
-
-        parser.add_argument(
-            f"--{name.replace('_', '-')}",
-            action=action,  # type: ignore
-            nargs=nargs,
-            default=None if required else param.default,
-            required=required,
-            metavar=metavar,
+    funcs = _format_funcs(*callables)
+    for name, (func, sig) in funcs.items():
+        funcparser = subparser.add_parser(
+            name,
+            description=func.__doc__,
+            help="This is a helpful string.",
         )
 
-    kwargs = vars(parser.parse_args(args))
-    return {
-        key: _validate_type(value, sig.parameters[key].annotation) for key, value in kwargs.items()
+        for key, param in sig.parameters.items():
+            if key in BANNED_KEYWORDS:
+                raise ValueError(f"Function has a banned keyword {key}!")
+
+            annotation: type = param.annotation
+            action, nargs = get_argtype(get_types(annotation))
+            required = param.default == Parameter.empty
+            metavar = str(annotation) + ("" if required else f" (default: {param.default})")
+
+            funcparser.add_argument(
+                f"--{key.replace('_', '-')}",
+                action=action,  # type: ignore[arg-type] # action can be None!
+                nargs=nargs,
+                default=None if required else param.default,
+                required=required,
+                metavar=metavar,
+            )
+
+    cliargs = vars(rootparser.parse_args(args))
+    name = cliargs.pop(FUNC_DEST)
+    func, sig = funcs[name]
+    kwargs = {
+        key: _validate_type(value, sig.parameters[key].annotation) for key, value in cliargs.items()
     }
+
+    return func, kwargs
+
+
+def _format_funcs(*callables: Func[R]) -> dict[str, tuple[Func[R], Signature]]:
+    funcs: dict[str, tuple[Func[R], Signature]] = {}
+    for callable in callables:
+        name = callable.__name__
+
+        if name in funcs:
+            raise ValueError(f"Cannot have the same function name ({name}) twice!")
+
+        funcs[name] = callable, signature(callable)
+
+    return funcs
 
 
 ArgType = tuple[str | type[Action] | None, int | str | None]
