@@ -1,6 +1,6 @@
 [project]
 name = "pycli2"
-version = "0.1"
+dynamic = ["version"]
 requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2,<3",
@@ -21,7 +21,8 @@ dev = [
 
 [build-system]
 requires = [
-    "setuptools",
+    "setuptools>=80.9,<81",
+    "semver>=3.0.4,<4",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,0 +1,37 @@
+# This workflow will build the python package, and publish it to PyPI.
+# https://docs.github.com/en/actions/tutorials/build-and-test-code/python#testing-your-code
+
+name: Python Publish
+on:
+  push:
+    branches:
+        - master
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Build Package
+        run: uv build
+        env:
+          BUILD: "" # Set build version to nothing => Offical release
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
