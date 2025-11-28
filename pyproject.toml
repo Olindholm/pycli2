@@ -3,26 +3,33 @@ name = "pycli2"
 dynamic = ["version"]
 requires-python = ">=3.10"
 dependencies = [
-    "pydantic>=2,<3",
+    "pydantic>=2.1,<3 ; python_version <= '3.12'",
+    "pydantic>=2.8,<3 ; python_version == '3.13'",
+    "pydantic>=2.12,<3 ; python_version >= '3.14'",
 ]
 
 [project.optional-dependencies]
 dev = [
     # Pytest
-    "pytest",
-    "pytest-asyncio",
+    "pytest==8.4.2",
+    "pytest-asyncio==1.2.0",
     # Ruff
-    "ruff",
-    "pytest-ruff",
+    "ruff==0.14.4",
+    "pytest-ruff==0.5",
     # Mypy
-    "mypy",
-    "pytest-mypy",
+    "mypy==1.18.2",
+    "pytest-mypy==1.0.1",
+    # Typing
+    "types-setuptools==80.9.0.20250822",
+    # Build System
+    "setuptools==80.9.0",
+    "semver==3.0.4",
 ]
 
 [build-system]
 requires = [
-    "setuptools>=80.9,<81",
-    "semver>=3.0.4,<4",
+    "setuptools==80.9.0",
+    "semver==3.0.4",
 ]
 
 [tool.setuptools.packages.find]
