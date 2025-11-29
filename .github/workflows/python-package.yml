@@ -97,3 +97,33 @@ jobs:
           tag_name: ${{ needs.build.outputs.taginfo_tagname }}
           files: |
             dist/*
+
+  publish-pypi:
+    name: Publish Distribution
+    runs-on: ubuntu-latest
+    needs:
+      - build
+
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+
+    # Dedicated environments with protections for publishing are strongly recommended.
+    environment:
+      name: pypi
+
+    steps:
+      - name: Retrieve Tarball (Source) Distribution
+        uses: actions/download-artifact@v5
+        with:
+          name: sdist
+          path: dist/
+
+      - name: Retrieve Wheel Distribution
+        uses: actions/download-artifact@v5
+        with:
+          name: wheel
+          path: dist/
+
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@6f7e8d9c0b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d
