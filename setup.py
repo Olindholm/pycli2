@@ -1,6 +1,7 @@
 import os
 import subprocess
 from collections.abc import Sequence
+from distutils.util import strtobool
 from email.parser import Parser
 from pathlib import Path
 from typing import NoReturn
@@ -38,6 +39,10 @@ def get_git_version(version_file: Path = Path("version.txt")) -> Version | None:
 
 
 def get_git_count_commits(file: Path) -> int:
+    shallow, _ = sh(("git", "rev-parse", "--is-shallow-repository"))
+    if strtobool(shallow):
+        raise RuntimeError("Git repository is shallow!")
+
     vcommit, _ = sh(("git", "log", "--first-parent", "-1", "--pretty=%H", "--", file.as_posix()))
     count, _ = sh(("git", "rev-list", "--first-parent", "--count", f"{vcommit}..HEAD"))
     return int(count)
