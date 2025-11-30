@@ -20,6 +20,61 @@ def test_simple() -> None:
 
 
 @pytest.mark.parametrize(
+    "input, value",
+    [
+        ("True", True),
+        ("true", True),
+        ("1", True),
+        ("False", False),
+        ("false", False),
+        ("0", False),
+    ],
+)
+def test_bool(input: str, value: bool) -> None:
+    # Arrange
+    def func(json: bool) -> None: ...
+
+    args = ["--json", input]
+
+    # Act & Assert
+    assert parse_func_args(func, args=["func", *args]) == (func, {"json": value})
+
+
+@pytest.mark.parametrize(
+    "args, value",
+    [
+        (["--json"], True),
+        (["--no-json"], False),
+    ],
+)
+def test_boolflags(args: list[str], value: bool) -> None:
+    # Arrange
+    def func(json: bool) -> None: ...
+
+    # Act & Assert
+    assert parse_func_args(func, args=["func", *args], boolflags=True) == (func, {"json": value})
+
+
+@pytest.mark.parametrize(
+    "default, args, value",
+    [
+        (True, [], True),
+        (False, [], False),
+        (True, "--json", True),
+        (False, "--json", True),
+        (True, "--no-json", False),
+        (False, "--no-json", False),
+    ],
+)
+def test_boolflags_default(default: bool, args: list[str], value: bool) -> None:
+    # Arrange
+    def func(json: bool = default) -> None: ...
+
+    # Act & Assert
+    assert parse_func_args(func, args=["func", *args], boolflags=True) == (func, {"json": value})
+
+
+@pytest.mark.parametrize(
     "args, vars",
     [
         (["--loc", "https://eg.com/file.txt"], {"loc": AnyUrl("https://eg.com/file.txt")}),

@@ -19,6 +19,7 @@ BANNED_KEYWORDS = (FUNC_DEST,)
 def parse_func_args(
     *callables: Func[R],
     args: Sequence[str] | None,
+    boolflags: bool = False,
     prog: str | None = None,
     description: str | None = None,
     epilog: str | None = None,
