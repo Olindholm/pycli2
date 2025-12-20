@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   tag:
@@ -55,3 +56,13 @@ jobs:
         with:
           tag: ${{ steps.taginfo.outputs.tagname }}
           message: ${{ steps.taginfo.outputs.message }}
+
+      # Because GitHub's own push actions can't trigger flows themselves,
+      # we have to trigger the flow manually.
+      # https://stackoverflow.com/a/73974083/1062668
+      - name: Trigger release flows
+        env:
+          TAGNAME: ${{ steps.taginfo.outputs.tagname }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run python-package.yml --ref $TAGNAME

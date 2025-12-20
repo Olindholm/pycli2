@@ -5,6 +5,10 @@ name: Python Publish
 on:
   push:
     tags: ["v*"]
+  # Because GitHub's own push actions can't trigger flows themselves,
+  # we have to trigger the flow manually.
+  # https://stackoverflow.com/a/73974083/1062668
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -27,7 +31,7 @@ jobs:
           VERSION=${TAGNAME:1}
 
           echo "tagname=${TAGNAME}" >> "$GITHUB_OUTPUT"
-          echo "message=${MESSAGE}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v5
 
