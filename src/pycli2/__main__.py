@@ -35,5 +35,6 @@ if __name__ == "__main__":
         message,
         shoutout,
         roll,
+        prog="pycli2",
         description="Welcome to the PyCLI2 demo example! Select a function to try out!",
     )

@@ -1,21 +1,72 @@
 # PyCLI2
 
-Python library to easily parse function arguments from CLI.
+Python library to auto parse command line args from function typing.
 
-# Install from PyPI
+# Overview
 
-Use the package manager of your choice to install from [PyPI](https://pypi.org/),
-[pip](https://pip.pypa.io/en/stable/installation/) or [uv](https://docs.astral.sh/uv/).
+This package simplfies the creation of CLI apps, by analysing the typing of python functions and
+parsing command line arguments.
 
+# Installation
+
+The python package, both wheel and source distribution is available at
+[PyPI pycli2 project](https://pypi.org/project/pycli2/). Install using your python package manager
+of choice. E.g. [pip](https://pip.pypa.io/en/stable/installation/) or
+[uv](https://docs.astral.sh/uv/).
 ```sh
-pip install pycli2
+uv pip install pycli2
 ```
 
-# Build Distribution
+# Usage
+
+The package comes with a demo CLI, which the source can be view at
+[src/pycli2/\_\_main\_\_.py](src/pycli2/__main__.py). It can be accessed by running
+```sh
+python -m pycli --help
+```
+
+In order to make your own CLI, simply import `pycli2` and use the `pycli2.run` function.
+Provide it with functions, and it'll automatically create a CLI app from the function
+typing and function docstring.
+
+```python
+import pycli2
+
+if __name__ == "__main__":
+    # This will expose firstfunc, secondfunc, and thirdfunc to the CLI.
+    pycli2.run(
+        firstfunc,
+        secondfunc,
+        thirdfunc,
+    )
+```
+
+# Contributing
+
 ...
 
-# Build Documenation
+## Install locally
+
+Install in edit mode, with dev dependendencies using your python package manager of choice.
+E.g. [pip](https://pip.pypa.io/en/stable/installation/) or [uv](https://docs.astral.sh/uv/).
+```sh
+uv pip install -e .[dev]
+```
+
+## Build
+
+Build a distribution by setting the `PYTHON_PACKAGE` environment variable to the version and run
+
+```sh
+uv build
+```
+
+The documentation can also be built using the [Sphinx](https://www.sphinx-doc.org).
 
 ```sh
 sphinx-build -M html docs/ dist/
 ```
+
+# License
+
+This project is licensed under the [GNU General Public License v3.0 only](LICENSE.md).
