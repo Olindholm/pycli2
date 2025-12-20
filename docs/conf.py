@@ -35,7 +35,9 @@ extensions = [
 ]
 
 AUTOAPI_DIR = DOCS_DIR / "_api"
-shutil.rmtree(AUTOAPI_DIR)
+if AUTOAPI_DIR.exists():
+    shutil.rmtree(AUTOAPI_DIR)
+
 autoapi_modules = {
     "pycli2": {
         "prune": True,

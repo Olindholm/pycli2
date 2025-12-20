@@ -11,6 +11,5 @@ Contents
 .. toctree::
    :caption: API Reference
    :hidden:
-   :maxdepth: 2
 
    _api/pycli2
