@@ -29,7 +29,7 @@ dev = [
 [build-system]
 requires = [
     "setuptools==80.9.0",
-    "semver==3.0.4",
+    "packaging==25.0",
 ]
 
 [tool.setuptools.packages.find]

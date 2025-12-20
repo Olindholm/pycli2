@@ -32,8 +32,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 65535 # Full branch history (or at least most of it)
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5

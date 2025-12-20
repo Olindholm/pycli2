@@ -3,10 +3,8 @@
 
 name: Python Publish
 on:
-  workflow_run:
-    workflows: ["Python Pytest"]
-    types: [completed]
-    branches: [master]
+  push:
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -18,13 +16,20 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      pkginfo_version: ${{ steps.pkginfo.outputs.version }}
-      taginfo_tagname: ${{ steps.taginfo.outputs.tagname }}
+      tagname: ${{ steps.info.outputs.tagname }}
+      version: ${{ steps.info.outputs.version }}
 
     steps:
+      - name: Determine tag and version info
+        id: info
+        run: |
+          TAGNAME=${GITHUB_REF_NAME}
+          VERSION=${TAGNAME:1}
+
+          echo "tagname=${TAGNAME}" >> "$GITHUB_OUTPUT"
+          echo "message=${MESSAGE}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 65535 # Full branch history (or at least most of it)
 
       - uses: actions/setup-python@v5
         with:
@@ -35,29 +40,8 @@ jobs:
 
       - name: Build Package
         env:
-          BUILD: "" # Set build version to nothing => Offical release
+          PACKAGE_VERSION: ${{ steps.info.outputs.version }}
         run: uv build
-
-      - name: Readout package info
-        id: pkginfo
-        run: |
-          version=$(uv tool run pkginfo --single -f version dist/*.tar.gz)
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-
-      - name: Set tag info
-        id: taginfo
-        env:
-          TAGNAME: v${{ steps.pkginfo.outputs.version }}
-          MESSAGE: ""
-        run: |
-          echo "tagname=${TAGNAME}" >> "$GITHUB_OUTPUT"
-          echo "message=${MESSAGE}" >> "$GITHUB_OUTPUT"
-
-      - name: Tag build
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: ${{ steps.taginfo.outputs.tagname }}
-          message: ${{ steps.taginfo.outputs.message }}
 
       - name: Upload Tarball (Source) Distribution
         uses: actions/upload-artifact@v4
@@ -94,7 +78,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build.outputs.taginfo_tagname }}
+          tag_name: ${{ needs.build.outputs.tagname }}
           files: |
             dist/*
 
