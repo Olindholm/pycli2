@@ -65,4 +65,4 @@ jobs:
           TAGNAME: ${{ steps.taginfo.outputs.tagname }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run python-package.yml --ref $TAGNAME
+          gh workflow run python-2-deploy.yml --ref $TAGNAME
