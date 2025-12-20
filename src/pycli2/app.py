@@ -10,6 +10,15 @@ def run(
     description: str | None = None,
     epilog: str | None = None,
 ) -> R:
+    """Runs a CLI program with the callables as run options.
+
+    Args:
+        callables: Callable functions possible to run (choose) from CLI.
+        args: The CLI arguments to parse, or sys.argv if None.
+        prog: The name of the program.
+        description: The description of the program, shown when using help flags.
+        epilog: The program epilog (bottom of the program description).
+    """
     func, kwargs = parse_func_args(
         *callables,
         args=args,
