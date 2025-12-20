@@ -1,0 +1,57 @@
+# This workflow will tag release versions automatically
+
+name: Tag Release (automatic)
+on:
+  workflow_run:
+    workflows: ["Python Pytest"]
+    types: [completed]
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Create Release Version
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 65535 # Full branch history (or at least most of it)
+
+      - name: Calculate version
+        id: info
+        env:
+          VFILE: version.txt
+        run: |
+          # Ensure repository is not shallow
+          SHALLOW=$(git rev-parse --is-shallow-repository)
+          if [[ "$SHALLOW" == "true" ]]; then
+            echo "Repository is shallow! Version calculation could be inaccurate!"
+            exit 92
+          fi
+
+          # Calculate version
+          BASE=$(cat $VFILE)
+          VCOMMIT=$(git log --first-parent -1 --pretty=%H -- $VFILE)
+          SUFFIX=$(git rev-list --first-parent --count $VCOMMIT..HEAD)
+          VERSION=$BASE.$SUFFIX
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set tag info
+        id: taginfo
+        env:
+          TAGNAME: v${{ steps.info.outputs.version }}
+          MESSAGE: ""
+        run: |
+          echo "tagname=${TAGNAME}" >> "$GITHUB_OUTPUT"
+          echo "message=${MESSAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Tag version
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.taginfo.outputs.tagname }}
+          message: ${{ steps.taginfo.outputs.message }}
