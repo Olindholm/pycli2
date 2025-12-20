@@ -36,7 +36,8 @@ dev = [
 ]
 
 [project.urls]
-source = "https://github.com/Olindholm/pycli2.git"
+Homepage = "https://github.com/Olindholm/pycli2"
+Source = "https://github.com/Olindholm/pycli2.git"
 
 [build-system]
 requires = [
