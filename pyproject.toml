@@ -1,5 +1,14 @@
 [project]
 name = "pycli2"
+keywords = ["cli", "command", "line", "arg", "interface", "parse", "typing"]
+description = "Python library to auto parse command line args from function typing."
+readme = "README.md"
+license = "GPL-3.0-only"
+license-files = ["LICENSE.md"]
+authors = [
+    { name = "Osvald Lindholm", email = "osvald.lindholm@gmail.com" },
+]
+
 dynamic = ["version"]
 requires-python = ">=3.10"
 dependencies = [
@@ -25,6 +34,9 @@ dev = [
     "setuptools==80.9.0",
     "semver==3.0.4",
 ]
+
+[project.urls]
+source = "https://github.com/Olindholm/pycli2.git"
 
 [build-system]
 requires = [
