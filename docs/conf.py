@@ -16,23 +16,27 @@ sys.path.insert(0, SRC_DIR.as_posix())
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "PyCLI2"
-copyright = "2025, MMEEE"
-author = "MMEEE"
+author = "Osvald Lindholm"
+copyright = f"2025, {author}"
+# TODO handle verison + release vars.
 
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "autoapi.sphinx",
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.inheritance_diagram",
-    "sphinx_rtd_theme",
+    "sphinx.ext.intersphinx",  # Auto links basic types and libs.
+    "sphinx.ext.napoleon",  # Support for google docstyle.
+    "myst_parser",  # Allows includes of markdown files.
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
 ]
+
+
+# AutoAPI
+# https://autoapi.readthedocs.io/
+
+extensions += ["sphinx.ext.autodoc", "sphinx.ext.inheritance_diagram", "autoapi.sphinx"]
 
 AUTOAPI_DIR = DOCS_DIR / "_api"
 if AUTOAPI_DIR.exists():
@@ -44,6 +48,7 @@ autoapi_modules = {
         "output": AUTOAPI_DIR,
     },
 }
+
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -65,8 +70,10 @@ language = "en"
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["Thumbs.db", ".DS_Store", ".ipynb_checkpoints"]
 
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
+extensions += ["sphinx_rtd_theme"]
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["static"]
