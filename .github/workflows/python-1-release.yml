@@ -1,7 +1,7 @@
 name: Python Release
 on:
   workflow_run:
-    workflows: ["Python Pytest"]
+    workflows: ["Python Check"]
     types: [completed]
     branches: [master]
 
