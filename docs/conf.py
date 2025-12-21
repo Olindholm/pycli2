@@ -18,7 +18,8 @@ sys.path.insert(0, SRC_DIR.as_posix())
 project = "PyCLI2"
 author = "Osvald Lindholm"
 copyright = f"2025, {author}"
-# TODO handle verison + release vars.
+version = "v0+dev"  # TODO
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,6 +33,8 @@ extensions = [
     "IPython.sphinxext.ipython_directive",
 ]
 
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ["templates"]
 
 # AutoAPI
 # https://autoapi.readthedocs.io/
@@ -74,6 +77,24 @@ exclude_patterns = ["Thumbs.db", ".DS_Store", ".ipynb_checkpoints"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
+html_static_path = ["static"]
+html_js_files = ["versions.js"]
+
+# HTML Theme
+import sphinx_rtd_theme  # noqa: E402
+
+sphinx_rtd_theme_url = "https://raw.githubusercontent.com/readthedocs/sphinx_rtd_theme"
+sphinx_rtd_theme_urlversion = f"{sphinx_rtd_theme_url}/refs/tags/{sphinx_rtd_theme.__version__}"
+
 extensions += ["sphinx_rtd_theme"]
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["static"]
+html_favicon = f"{sphinx_rtd_theme_urlversion}/docs/demo/static/favicon.ico"
+
+html_theme_options = {
+    "version_selector": True,
+    "language_selector": False,
+}
+
+html_context = {
+    "current_version": version,
+}
