@@ -1,6 +1,4 @@
-# This workflow will tag release versions automatically
-
-name: Tag Release (automatic)
+name: Python Release
 on:
   workflow_run:
     workflows: ["Python Pytest"]

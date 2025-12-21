@@ -1,4 +1,4 @@
-name: Python
+name: Python Check
 on:
   push:
     branches: [master]
@@ -56,8 +56,8 @@ jobs:
           pytest
             --doctest-modules
 
-  sphinx:
-    name: Sphinx
+  docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
 
     steps:
