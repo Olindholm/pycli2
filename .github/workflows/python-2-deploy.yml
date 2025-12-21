@@ -83,7 +83,7 @@ jobs:
       - name: Build Sphinx Documentation
         env:
           PACKAGE_VERSION: ${{ needs.info.outputs.version }}
-        run:
+        run: |
           sphinx-build -M html docs/ dist/
           tar -C dist/ -cvzf dist/docs-$PACKAGE_VERSION.tar.gz doctrees html
 
