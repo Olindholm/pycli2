@@ -1,17 +1,17 @@
-# This workflow will run pytest and lint with a variety of Python versions.
-# https://docs.github.com/en/actions/tutorials/build-and-test-code/python#testing-your-code
-
-name: Python Pytest
+name: Python Check
 on:
   push:
     branches: [master]
   pull_request:
-    types: [opened, reopened]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
 
 jobs:
+
+  # This workflow will run pytest and lint with a variety of Python versions.
+  # https://docs.github.com/en/actions/tutorials/build-and-test-code/python#testing-your-code
   pytest:
     name: Pytest
     runs-on: ${{ matrix.os }}
@@ -55,3 +55,28 @@ jobs:
         run:
           pytest
             --doctest-modules
+
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install Package
+        run:
+          uv pip install
+            --system
+            .[dev]
+
+      - name: Build Sphinx Documentation
+        run:
+          sphinx-build -M html docs/ dist/

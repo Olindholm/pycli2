@@ -1,6 +1,4 @@
-# This workflow will tag release versions automatically
-
-name: Tag Release (automatic)
+name: Python Release
 on:
   workflow_run:
     workflows: ["Python Pytest"]
@@ -65,4 +63,4 @@ jobs:
           TAGNAME: ${{ steps.taginfo.outputs.tagname }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run python-package.yml --ref $TAGNAME
+          gh workflow run python-2-deploy.yml --ref $TAGNAME

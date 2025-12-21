@@ -1,7 +1,4 @@
-# This workflow will build the python package, and publish it to PyPI.
-# https://docs.github.com/en/actions/tutorials/build-and-test-code/python#publishing-to-pypi
-
-name: Python Publish
+name: Python Deploy
 on:
   push:
     tags: ["v*"]
@@ -14,9 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    name: Build Distribution
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  info:
+    name: Determine Deployment Info
     runs-on: ubuntu-latest
 
     outputs:
@@ -33,6 +29,11 @@ jobs:
           echo "tagname=${TAGNAME}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
+  build:
+    name: Build Python Package
+    runs-on: ubuntu-latest
+    needs: [info]
+    steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-python@v5
@@ -44,7 +45,7 @@ jobs:
 
       - name: Build Package
         env:
-          PACKAGE_VERSION: ${{ steps.info.outputs.version }}
+          PACKAGE_VERSION: ${{ needs.info.outputs.version }}
         run: uv build
 
       - name: Upload Tarball (Source) Distribution
@@ -59,11 +60,43 @@ jobs:
           name: wheel
           path: dist/*.whl
 
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    needs: [info]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install Package
+        run:
+          uv pip install
+            --system
+            .[dev]
+
+      - name: Build Sphinx Documentation
+        env:
+          PACKAGE_VERSION: ${{ needs.info.outputs.version }}
+        run:
+          sphinx-build -M html docs/ dist/
+          tar -C dist/ -cvzf dist/docs-$PACKAGE_VERSION.tar.gz doctrees html
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: dist/*.tar.gz
+
   publish-github:
     name: Publish Distribution as Github Release
     runs-on: ubuntu-latest
-    needs:
-      - build
+    needs: [info, build, docs]
     steps:
       - uses: actions/checkout@v5
 
@@ -79,18 +112,25 @@ jobs:
           name: wheel
           path: dist/
 
+      - name: Retrieve Documentation
+        uses: actions/download-artifact@v5
+        with:
+          name: docs
+          path: dist/
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.build.outputs.tagname }}
+          tag_name: ${{ needs.info.outputs.tagname }}
           files: |
             dist/*
 
+  # This workflow will build the python package, and publish it to PyPI.
+  # https://docs.github.com/en/actions/tutorials/build-and-test-code/python#publishing-to-pypi
   publish-pypi:
     name: Publish Distribution
     runs-on: ubuntu-latest
-    needs:
-      - build
+    needs: [build]
 
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing

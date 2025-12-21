@@ -11,9 +11,10 @@ parsing command line arguments.
 
 The python package, both wheel and source distribution is available at
 [PyPI pycli2 project](https://pypi.org/project/pycli2/). Install using your python package manager
-of choice. E.g. pip.
+of choice. E.g. [pip](https://pip.pypa.io/en/stable/installation/) or
+[uv](https://docs.astral.sh/uv/).
 ```sh
-pip install pycli2
+uv pip install pycli2
 ```
 
 # Usage
@@ -43,6 +44,28 @@ if __name__ == "__main__":
 # Contributing
 
 ...
+
+## Install locally
+
+Install in edit mode, with dev dependendencies using your python package manager of choice.
+E.g. [pip](https://pip.pypa.io/en/stable/installation/) or [uv](https://docs.astral.sh/uv/).
+```sh
+uv pip install -e .[dev]
+```
+
+## Build
+
+Build a distribution by setting the `PYTHON_PACKAGE` environment variable to the version and run
+
+```sh
+uv build
+```
+
+The documentation can also be built using the [Sphinx](https://www.sphinx-doc.org).
+
+```sh
+sphinx-build -M html docs/ dist/
+```
 
 # License
 
